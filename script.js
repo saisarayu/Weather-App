@@ -1,4 +1,4 @@
-const apiKey = "8022577be8153386445f4e290059bdf9"; // Replace with your OpenWeather API key
+const apiKey = "8022577be8153386445f4e290059bdf9";
 
 document.getElementById("searchBtn").addEventListener("click", () => {
   const city = document.getElementById("cityInput").value.trim();
@@ -8,6 +8,7 @@ document.getElementById("searchBtn").addEventListener("click", () => {
     document.getElementById("weatherResult").innerHTML = `<p>⚠️ Please enter a city</p>`;
   }
 });
+
 
 async function getWeather(city) {
   try {
