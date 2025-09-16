@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      justify-content: center; /* Horizontal center */
+      align-items: center;     /* Vertical center */
+      overflow: hidden;
+      background: linear-gradient(to top, #87CEEB, #f0f8ff);
+      position: relative;
+    }
+
+    /* Clouds */
+    .cloud {
+      position: absolute;
+      background: #fff;
+      background: linear-gradient(to bottom, #fff 0%, #f1f1f1 100%);
+      border-radius: 50%;
+      width: 200px;
+      height: 60px;
+      opacity: 0.8;
+      animation: moveClouds 60s linear infinite;
+    }
+
+    .cloud::before,
+    .cloud::after {
+      content: '';
+      position: absolute;
+      background: #fff;
+      width: 100px;
+      height: 80px;
+      top: -20px;
+      left: 10px;
+      border-radius: 50%;
+    }
+
+    .cloud::after {
+      width: 120px;
+      height: 120px;
+      top: -40px;
+      left: 80px;
+    }
+
+    @keyframes moveClouds {
+      0% { transform: translateX(-250px); }
+      100% { transform: translateX(100vw); }
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      width: 300px;
+    }
+
+    .search-box {
+      margin: 1rem 0;
+    }
+
+    input {
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 60%;
+    }
+
+    button {
+      padding: 0.5rem 1rem;
+      margin-left: 0.5rem;
+      background: #4facfe;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00c6ff;
+    }
+
+    #weatherResult {
+      margin-top: 1.5rem;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Clouds -->
+  <!-- Clouds with more gaps -->
+<!-- Clouds with lowered positions -->
+<div class="cloud" style="top: 100px; left: -250px; animation-duration: 70s;"></div>
+<div class="cloud" style="top: 160px; left: 100px; width: 220px; height: 70px; animation-duration: 80s;"></div>
+<div class="cloud" style="top: 220px; left: -150px; width: 150px; height: 50px; animation-duration: 100s;"></div>
+<div class="cloud" style="top: 280px; left: 50px; width: 180px; height: 55px; animation-duration: 90s;"></div>
+
+
+  <div class="container">
+    <h1>🌦 Weather App</h1>
+    <div class="search-box">
+      <input type="text" id="cityInput" placeholder="Enter city name">
+      <button id="searchBtn">Search</button>
+    </div>
+    <div id="weatherResult"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
