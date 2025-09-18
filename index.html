@@ -3,117 +3,254 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather App</title>
-  
+  <title>Weather Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      height: 100vh;
-      display: flex;
-      justify-content: center; /* Horizontal center */
-      align-items: center;     /* Vertical center */
-      overflow: hidden;
-      background: linear-gradient(to top, #87CEEB, #f0f8ff);
-      position: relative;
-    }
+/* --- Reset + Fonts --- */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  overflow-x: hidden;
+  transition: background 0.5s, color 0.5s;
+}
 
-    /* Clouds */
-    .cloud {
-      position: absolute;
-      background: #fff;
-      background: linear-gradient(to bottom, #fff 0%, #f1f1f1 100%);
-      border-radius: 50%;
-      width: 200px;
-      height: 60px;
-      opacity: 0.8;
-      animation: moveClouds 60s linear infinite;
-    }
+/* --- Sky Background --- */
+.sky {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: linear-gradient(to top, #87ceeb, #e0f7ff);
+  z-index: -1;
+  overflow: hidden;
+}
 
-    .cloud::before,
-    .cloud::after {
-      content: '';
-      position: absolute;
-      background: #fff;
-      width: 100px;
-      height: 80px;
-      top: -20px;
-      left: 10px;
-      border-radius: 50%;
-    }
+/* ☀️ Sun */
+.sun {
+  position: absolute;
+  top: 60px;
+  right: 100px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, #FFD93D, #FFA500);
+  border-radius: 50%;
+  box-shadow: 0 0 60px rgba(255, 200, 0, 0.7);
+}
 
-    .cloud::after {
-      width: 120px;
-      height: 120px;
-      top: -40px;
-      left: 80px;
-    }
+/* ☁️ Clouds (static, only 3 kept) */
+.cloud {
+  position: absolute;
+}
+.cloud div {
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+}
 
-    @keyframes moveClouds {
-      0% { transform: translateX(-250px); }
-      100% { transform: translateX(100vw); }
-    }
+/* Only 3 clouds (spread) */
+.cloud1 { top: 80px; left: 80px; }
+.cloud2 { top: 150px; left: 500px; }
+.cloud3 { top: 250px; left: 900px; }
 
-    .container {
-      background: rgba(255, 255, 255, 0.9);
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      text-align: center;
-      position: relative;
-      z-index: 1;
-      width: 300px;
-    }
+/* Cloud shapes */
+.cloud1 div:nth-child(1) { width: 90px; height: 90px; left: 0; top: 20px; }
+.cloud1 div:nth-child(2) { width: 120px; height: 120px; left: 60px; top: 0; }
+.cloud1 div:nth-child(3) { width: 80px; height: 80px; left: 140px; top: 25px; }
 
-    .search-box {
-      margin: 1rem 0;
-    }
+.cloud2 div:nth-child(1) { width: 70px; height: 70px; left: 0; top: 25px; }
+.cloud2 div:nth-child(2) { width: 110px; height: 110px; left: 50px; top: 0; }
+.cloud2 div:nth-child(3) { width: 75px; height: 75px; left: 120px; top: 20px; }
 
-    input {
-      padding: 0.5rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      width: 60%;
-    }
+.cloud3 div:nth-child(1) { width: 80px; height: 80px; left: 0; top: 20px; }
+.cloud3 div:nth-child(2) { width: 100px; height: 100px; left: 60px; top: 0; }
+.cloud3 div:nth-child(3) { width: 70px; height: 70px; left: 130px; top: 25px; }
 
-    button {
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
-      background: #4facfe;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+/* 🌙 Moon */
+.moon {
+  position: absolute;
+  top: 60px;
+  right: 100px;
+  width: 100px; height: 100px;
+  background: radial-gradient(circle, #f5f3ce, #d9d6a8);
+  border-radius: 50%;
+  box-shadow: 0 0 40px rgba(245, 243, 206, 0.7);
+  display: none;
+}
 
-    button:hover {
-      background: #00c6ff;
-    }
+/* ⭐ Stars */
+.star {
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  opacity: 0.8;
+  display: none;
+}
 
-    #weatherResult {
-      margin-top: 1.5rem;
-    }
+/* --- Container --- */
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search {
+  margin: 15px 0;
+  display: flex;
+  gap: 8px;
+}
+
+input, button {
+  padding: 8px 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+button {
+  background: #5dade2;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #3d8ec9;
+}
+
+.weather-info {
+  margin-bottom: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.forecast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.forecast-card {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 6px;
+  text-align: center;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  color: black; /* ensures visibility in both modes */
+}
+
+.forecast-card:hover {
+  transform: translateY(-2px);
+}
+
+/* --- Dark Mode --- */
+.dark {
+  color: #e0e6f1; /* soft bluish-white text */
+}
+.dark .sky {
+  background: linear-gradient(to bottom, #0a192f, #1a1a2e);
+}
+.dark .sun, 
+.dark .cloud {
+  display: none;
+}
+.dark .moon,
+.dark .star {
+  display: block;
+}
+.dark .container {
+  background: rgba(13, 25, 42, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+.dark h1, 
+.dark h2, 
+.dark input, 
+.dark button, 
+.dark .weather-info {
+  color: #e0e6f1;
+}
+.dark .forecast-card {
+  background: rgba(20, 30, 60, 0.9);
+  color: #e0e6f1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dark .forecast-date,
+.dark .forecast-temp,
+.dark .forecast-icon {
+  color: #e0e6f1;
+}
+
+.dark #hourlyChart {
+  background: rgba(20, 30, 60, 0.9);
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dark h2 {
+  color: #e0e6f1;
+}
 
   </style>
 </head>
 <body>
-  <!-- Clouds -->
-  <!-- Clouds with more gaps -->
-<!-- Clouds with lowered positions -->
-<div class="cloud" style="top: 100px; left: -250px; animation-duration: 70s;"></div>
-<div class="cloud" style="top: 160px; left: 100px; width: 220px; height: 70px; animation-duration: 80s;"></div>
-<div class="cloud" style="top: 220px; left: -150px; width: 150px; height: 50px; animation-duration: 100s;"></div>
-<div class="cloud" style="top: 280px; left: 50px; width: 180px; height: 55px; animation-duration: 90s;"></div>
+  <!-- Sky Background -->
+  <div class="sky">
+    <div class="sun"></div>
+    
+    <!-- Only 3 Clouds -->
+    <div class="cloud cloud1"><div></div><div></div><div></div></div>
+    <div class="cloud cloud2"><div></div><div></div><div></div></div>
+    <div class="cloud cloud3"><div></div><div></div><div></div></div>
 
+    <!-- Moon -->
+    <div class="moon"></div>
 
+    <!-- Stars -->
+    <div class="star" style="top:50px; left:200px;">✦</div>
+    <div class="star" style="top:120px; left:600px;">✧</div>
+    <div class="star" style="top:250px; left:400px;">✶</div>
+    <div class="star" style="top:180px; left:800px;">✦</div>
+    <div class="star" style="top:320px; left:150px;">✧</div>
+    <div class="star" style="top:420px; left:700px;">✦</div>
+  </div>
+
+  <!-- Weather App -->
   <div class="container">
-    <h1>🌦 Weather App</h1>
-    <div class="search-box">
-      <input type="text" id="cityInput" placeholder="Enter city name">
+    <header>
+      <h1>🌦 Weather Dashboard</h1>
+      <button id="modeToggle">🌙 Dark Mode</button>
+    </header>
+
+    <div class="search">
+      <input type="text" id="cityInput" placeholder="Enter city">
       <button id="searchBtn">Search</button>
     </div>
-    <div id="weatherResult"></div>
+
+    <div id="weatherResult" class="weather-info"></div>
+
+    <section>
+      <h2>Hourly Forecast (Next 12 Hours)</h2>
+      <canvas id="hourlyChart"></canvas>
+    </section>
+
+    <section>
+      <h2>7-Day Forecast</h2>
+      <div id="weeklyForecast" class="forecast-grid"></div>
+    </section>
   </div>
 
   <script src="script.js"></script>
